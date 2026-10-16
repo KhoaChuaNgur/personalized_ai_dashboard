@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalized AI To-Do Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Background Ambient Glow -->
+  <div class="background-decorations" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-layout-container">
+    <!-- ================= SIDEBAR (TÌM KIẾM & BỘ LỌC) ================= -->
+    <aside class="sidebar-panel">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div class="brand-info">
+          <h2>TaskFlow Pro</h2>
+          <span>Dashboard Cá Nhân</span>
+        </div>
+      </div>
+
+      <!-- Real-time Search Box -->
+      <div class="search-box-wrapper">
+        <label for="search-input" class="sidebar-label">
+          <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm công việc
+        </label>
+        <div class="search-input-group">
+          <i class="fa-solid fa-search search-icon"></i>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Tìm theo tên task..." 
+            autocomplete="off"
+          />
+          <button type="button" id="clear-search-btn" class="clear-search-btn" title="Xóa tìm kiếm">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Navigation -->
+      <div class="sidebar-nav-section">
+        <span class="sidebar-label">Trạng thái công việc</span>
+        <nav class="filter-nav" aria-label="Bộ lọc tác vụ">
+          <button class="nav-filter-btn active" data-filter="all">
+            <span class="filter-content">
+              <i class="fa-solid fa-layer-group"></i> Tất cả
+            </span>
+            <span class="filter-badge" id="badge-all">0</span>
+          </button>
+          <button class="nav-filter-btn" data-filter="active">
+            <span class="filter-content">
+              <i class="fa-regular fa-circle-dot"></i> Chưa xong
+            </span>
+            <span class="filter-badge" id="badge-active">0</span>
+          </button>
+          <button class="nav-filter-btn" data-filter="completed">
+            <span class="filter-content">
+              <i class="fa-regular fa-circle-check"></i> Đã xong
+            </span>
+            <span class="filter-badge" id="badge-completed">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Priority Filter Pills -->
+      <div class="sidebar-nav-section">
+        <span class="sidebar-label">Lọc theo độ ưu tiên</span>
+        <div class="priority-filter-pills">
+          <button class="priority-pill active" data-priority-filter="all">Tất cả</button>
+          <button class="priority-pill pill-high" data-priority-filter="high">Quan trọng</button>
+          <button class="priority-pill pill-medium" data-priority-filter="medium">Bình thường</button>
+          <button class="priority-pill pill-low" data-priority-filter="low">Thấp</button>
+        </div>
+      </div>
+
+      <!-- Quick Action / Clear Finished -->
+      <div class="sidebar-footer-actions">
+        <button id="clear-completed-btn" class="btn-sidebar-action">
+          <i class="fa-regular fa-trash-can"></i> Dọn việc đã xong
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT AREA ================= -->
+    <main class="main-content-panel">
+      <div class="dashboard-card">
+
+        <!-- ================= 1. HEADER SECTION ================= -->
+        <header class="app-header">
+          <div class="header-main-row">
+            <!-- Personalized Greeting -->
+            <div class="user-greeting-box">
+              <div class="greeting-badge">
+                <span class="greeting-dot"></span>
+                <span id="day-period-text">Buổi sáng năng lượng</span>
+              </div>
+              <h1 class="greeting-title">
+                Chào <span class="highlight-name" id="user-name" contenteditable="true" title="Bấm vào để đổi tên">Khoa</span>, 
+                <span class="greeting-sub">hôm nay bạn thế nào?</span>
+              </h1>
+            </div>
+
+            <!-- Header Controls: Dark Mode Toggle & Realtime Clock -->
+            <div class="header-controls">
+              <!-- Dark Mode Switch Button -->
+              <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Chuyển đổi giao diện sáng/tối" title="Chuyển chế độ Sáng / Tối">
+                <div class="toggle-track">
+                  <div class="toggle-thumb">
+                    <i class="fa-solid fa-moon moon-icon"></i>
+                    <i class="fa-solid fa-sun sun-icon"></i>
+                  </div>
+                </div>
+                <span class="theme-label" id="theme-label-text">Tối</span>
+              </button>
+
+              <!-- Real-time Clock -->
+              <div class="realtime-clock-box">
+                <div class="clock-label">
+                  <i class="fa-regular fa-clock"></i> Thời gian thực
+                </div>
+                <div class="clock-display" id="realtime-clock">00:00:00</div>
+                <div class="date-display" id="realtime-date">Thứ Sáu, 16/10/2026</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ================= 2. INPUT SECTION (TIÊU ĐỀ & MÔ TẢ & PRIORITY) ================= -->
+        <section class="input-section">
+          <form id="todo-form" class="todo-form" autocomplete="off" novalidate>
+            <div class="form-main-row">
+              <!-- Task Title Input Field -->
+              <div class="input-field-group">
+                <i class="fa-solid fa-list-check input-icon"></i>
+                <input 
+                  type="text" 
+                  id="todo-input" 
+                  placeholder="Tiêu đề công việc cần làm..." 
+                  maxlength="140"
+                />
+              </div>
+
+              <!-- Priority Select Dropdown -->
+              <div class="priority-select-group">
+                <label for="priority-select" class="visually-hidden">Độ ưu tiên</label>
+                <i class="fa-solid fa-tag priority-icon"></i>
+                <select id="priority-select" class="priority-select" title="Chọn mức độ ưu tiên">
+                  <option value="high" class="opt-high">🔴 Quan trọng</option>
+                  <option value="medium" selected class="opt-medium">🔵 Bình thường</option>
+                  <option value="low" class="opt-low">🟢 Thấp</option>
+                </select>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="add-btn" class="btn-add">
+                <i class="fa-solid fa-plus"></i>
+                <span>Thêm</span>
+              </button>
+            </div>
+
+            <!-- Task Description Input (Mô tả chi tiết không bắt buộc) -->
+            <div class="desc-field-group">
+              <i class="fa-regular fa-file-lines desc-icon"></i>
+              <textarea 
+                id="todo-desc" 
+                class="todo-desc-input" 
+                placeholder="Mô tả chi tiết công việc (không bắt buộc)..." 
+                rows="2" 
+                maxlength="350"
+              ></textarea>
+            </div>
+          </form>
+        </section>
+
+        <!-- Active Search Alert / Result Indicator (nếu đang search) -->
+        <div id="search-status-bar" class="search-status-bar" style="display: none;">
+          <span>Kết quả tìm kiếm cho: <strong id="search-query-text">""</strong></span>
+          <button type="button" id="reset-search-link">Xóa lọc</button>
+        </div>
+
+        <!-- ================= 3. TASK LIST SECTION ================= -->
+        <section class="task-list-section">
+          <ul id="task-list" class="task-list">
+            <!-- Các công việc sẽ được render linh hoạt từ JavaScript -->
+          </ul>
+
+          <!-- Empty State -->
+          <div id="empty-state" class="empty-state">
+            <div class="empty-icon-wrap">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 id="empty-title">Không có công việc nào!</h3>
+            <p id="empty-desc">Thêm công việc mới hoặc thử thay đổi bộ lọc tìm kiếm để bắt đầu.</p>
+          </div>
+        </section>
+
+        <!-- ================= 4. FOOTER SECTION ================= -->
+        <footer class="app-footer">
+          <div class="footer-stat">
+            <span class="stat-label">Tổng số công việc:</span>
+            <span class="stat-counter" id="total-tasks-count">0</span>
+          </div>
+          <div class="footer-progress">
+            <span id="completed-stats-text">Đã hoàn thành: 0 / 0</span>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Thư viện tạo hiệu ứng pháo hoa Confetti siêu nhẹ (Canvas-based) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
